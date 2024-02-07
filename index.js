@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
     });
 });
 
+// mounting
 app.use('/api/v1', routes);
 
 // Cron job to check for overdue tasks and make voice calls

@@ -126,7 +126,6 @@ exports.getAllUserTasks = async (req, res) => {
 exports.getAllUserSubtasks = async (req, res) => {
     try {
         const { task_id } = req.params;
-        const userId = req.user.id;
 
         // Construct query based on provided task_id and user_id
         const query = {deleted_at: null};
