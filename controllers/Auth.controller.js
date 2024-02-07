@@ -9,7 +9,20 @@ exports.createUser = async (req, res) => {
 
         // validate
         if (!phone_number) {
-            return res.status(400).json({ message: "Phone number is required" });
+            return res.status(400).json({
+                success: false,
+                message: "Phone number is required"
+            });
+        }
+
+        // check if user already exists
+        const userExists = await User.findOne({ phone_number });
+
+        if (userExists) {
+            return res.status(400).json({
+                success: false,
+                message: "User already exists"
+            });
         }
 
         const user = new User({
@@ -17,7 +30,10 @@ exports.createUser = async (req, res) => {
         });
 
         await user.save();
-        res.status(200).json({ message: 'User created successfully' });
+        res.status(200).json({
+            success: true,
+            message: 'User created successfully'
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -52,12 +68,13 @@ exports.login = async (req, res) => {
 
         // Generate JWT token and Compare Password
         const token = jwt.sign(
-            { phone_number: user.phone_number, id: user._id, priority: user.priority},
+            { phone_number: user.phone_number, id: user._id, priority: user.priority },
             process.env.JWT_SECRET,
             {
                 expiresIn: "3d",
             }
         )
+
 
         // Save token to user document in database
         user.token = token
@@ -66,6 +83,11 @@ exports.login = async (req, res) => {
             expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
             httpOnly: true,
         }
+
+        // sending token in header
+        res.set('Authorization', `Bearer ${token}`);
+
+        // sending token in cookie
         res.cookie("token", token, options).status(200).json({
             success: true,
             token,
@@ -73,14 +95,14 @@ exports.login = async (req, res) => {
             message: `User Login Success`,
         })
     }
-     catch (error) {
-    console.error(error)
-    // Return 500 Internal Server Error status code with error message
-    return res.status(500).json({
-        success: false,
-        message: `Login Failure Please Try Again`,
-    })
-}
+    catch (error) {
+        console.error(error)
+        // Return 500 Internal Server Error status code with error message
+        return res.status(500).json({
+            success: false,
+            message: `Login Failure Please Try Again`,
+        })
+    }
 }
 
 // Update user priority API
