@@ -104,15 +104,3 @@ exports.login = async (req, res) => {
         })
     }
 }
-
-// Update user priority API
-exports.updateUserPriority = async (req, res) => {
-    try {
-        // Implement update user priority logic with input validation and error handling
-        const { id, priority } = req.body;
-        await User.findByIdAndUpdate(id, { priority });
-        res.status(200).json({ message: 'User priority updated successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};

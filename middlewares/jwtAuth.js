@@ -29,24 +29,3 @@ exports.verifyToken = async (req, res, next) => {
     return res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
 };
-
-// Middleware for extracting due_date from JWT token
-exports.extractDueDateFromToken = (req, res, next) => {
-  try {
-    // For demonstration purposes, I'm assuming you have a function to retrieve the token from the environment or request headers
-    // Replace this with your actual logic to get the JWT token
-    const jwtToken = req.cookies.token || req.body.token || req.header('Authorization').replace('Bearer ', '');
-
-    if (!jwtToken) {
-      console.error('JWT token not found.');
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const decodedToken = jwt.verify(jwtToken, SECRET_KEY);
-    req.due_date = new Date(decodedToken.due_date);
-    next();
-  } catch (error) {
-    console.error('Error extracting due_date from JWT token:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
